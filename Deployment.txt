@@ -1,0 +1,42 @@
+# ─── AWS EC2 Deployment Guide: Air India Chatbot (Grok AI / xAI) ─────────────
+
+# 1. Update system
+sudo apt update && sudo apt upgrade -y
+sudo apt install git curl python3-pip python3-venv -y
+
+# 2. Clone your repo
+git clone https://github.com/<your-username>/Air-India-Chatbot.git
+cd Air-India-Chatbot
+
+# 3. Create & activate virtual environment
+python3 -m venv .venv
+source .venv/bin/activate
+
+# 4. Install Python dependencies
+pip install -r requirements.txt
+
+# 5. Set up your xAI API Key
+# You can set it as an environment variable before running:
+export XAI_API_KEY="your_actual_xai_api_key_here"
+
+# OR (Recommended) Create a Streamlit secrets file:
+mkdir -p .streamlit
+echo 'XAI_API_KEY = "your_actual_xai_api_key_here"' > .streamlit/secrets.toml
+
+# 6. Run Streamlit (temporary / testing)
+python3 -m streamlit run app.py
+
+# 7. Run Streamlit permanently (in the background)
+# Note: If passing via environment variables, ensure it's exported in the same session,
+# or define it inline:
+XAI_API_KEY="your_actual_xai_api_key_here" nohup python3 -m streamlit run app.py &
+
+# ─── EC2 Security Group ────────────────────────────────────────────────────────
+# Add Inbound Rule in AWS Console:
+#   Type: Custom TCP
+#   Port: 8501
+#   Source: 0.0.0.0/0  (or your IP for restricted access)
+#
+# Access the app at: http://<your-ec2-public-ip>:8501
+
+nohup python3 -m streamlit run app.py --server.port 8501 --server.address 0.0.0.0 > streamlit.log 2>&1 &
