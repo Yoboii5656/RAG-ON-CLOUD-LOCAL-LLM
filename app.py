@@ -1,25 +1,11 @@
-import os
-import streamlit as st
-from langchain_xai import ChatXAI
 
-# from langchain_ollama import ChatOllama
+import streamlit as st
+from langchain_ollama import ChatOllama
 from langchain_community.document_loaders import DirectoryLoader, PyPDFLoader
 from langchain_core.prompts import PromptTemplate
 
 # ─── Page Config ───────────────────────────────────────────────────────────
-st.set_page_config(page_title="PDF Q&A with Grok", page_icon="📄", layout="wide")
-XAI_API_KEY = "YOUR-KEY"
-os.environ["XAI_API_KEY"] = XAI_API_KEY
-
-# ─── Configuration ─────────────────────────────────────────────────────────
-# Best practice: use st.secrets or environment variable
-XAI_API_KEY = os.getenv("XAI_API_KEY") or st.secrets.get("XAI_API_KEY", "")
-
-if not XAI_API_KEY:
-    st.error(
-        "XAI_API_KEY not found. Please set it in environment variables or .streamlit/secrets.toml"
-    )
-    st.stop()
+st.set_page_config(page_title="PDF Q&A with Mistral", page_icon="📄", layout="wide")
 
 PDF_FOLDER = "pdfs"  # ← change this to your actual folder
 GLOB_PATTERN = "**/*.pdf"  # recursive search
@@ -67,12 +53,9 @@ def load_documents():
 # ─── Cache LLM instance ────────────────────────────────────────────────────
 @st.cache_resource
 def get_llm():
-    return ChatXAI(
-        model="grok-4",
-        api_key=XAI_API_KEY,
+    return ChatOllama(
+        model="mistral",
         temperature=0.15,
-        max_tokens=2048,
-        streaming=True,
     )
 
 
